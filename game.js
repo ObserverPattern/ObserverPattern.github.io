@@ -3,13 +3,12 @@ const scoreValue = document.querySelector("#score-value");
 const bestValue = document.querySelector("#best-value");
 const gameState = document.querySelector("#game-state");
 const powerState = document.querySelector("#power-state");
-const gameOverlay = document.querySelector("#game-overlay");
-const startButton = document.querySelector("#start-button");
-const pauseButton = document.querySelector("#pause-button");
-const restartButton = document.querySelector("#restart-button");
-const touchControls = document.querySelector(".touch-controls");
+const gameMessage = document.querySelector("#game-message");
+const gameControl = document.querySelector("#game-control");
+const gameControlIcon = document.querySelector("#game-control-icon");
+const gameControlLabel = document.querySelector("#game-control-label");
 
-if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOverlay) {
+if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameMessage && gameControl) {
   const ctx = gameCanvas.getContext("2d");
   const GRID = 24;
   const CELL = 20;
@@ -30,14 +29,18 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
   let bestScore = readBestScore();
   let running = false;
   let gameOver = false;
+  let hasStarted = false;
+  let isPaused = false;
   let animationId = 0;
   let lastTick = 0;
   let accumulator = 0;
   let shieldUntil = 0;
   let doubleUntil = 0;
+  let swipeStart = null;
 
   gameCanvas.width = BOARD_SIZE;
   gameCanvas.height = BOARD_SIZE;
+  gameCanvas.style.touchAction = "none";
 
   function readBestScore() {
     try {
@@ -103,59 +106,8 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
     doubleItem = randomEmptyCell([food, shieldItem]);
   }
 
-  function resetGame() {
-    snake = [
-      { x: 10, y: 12 },
-      { x: 9, y: 12 },
-      { x: 8, y: 12 },
-    ];
-    direction = { x: 1, y: 0 };
-    queuedDirection = { x: 1, y: 0 };
-    pendingGrowth = 0;
-    score = 0;
-    running = false;
-    gameOver = false;
-    shieldUntil = 0;
-    doubleUntil = 0;
-    placeFood();
-    placeShield();
-    placeDouble();
-    updateHud("Ready", "Idle", "Start 버튼을 눌러 게임을 시작하세요.");
-    render();
-  }
-
-  function startGame() {
-    if (gameOver) {
-      resetGame();
-    }
-    lastTick = performance.now();
-    accumulator = 0;
-    running = true;
-    updateHud("Running", boostLabel(), "게임이 시작되었습니다. 방향키나 WASD를 사용하세요.");
-  }
-
-  function pauseGame() {
-    if (gameOver) return;
-    running = !running;
-    lastTick = performance.now();
-    accumulator = 0;
-    updateHud(running ? "Running" : "Paused", boostLabel(), running ? "게임이 다시 진행됩니다." : "일시정지 상태입니다.");
-  }
-
-  function restartGame() {
-    resetGame();
-    lastTick = performance.now();
-    accumulator = 0;
-    running = true;
-    updateHud("Running", boostLabel(), "게임을 다시 시작했습니다.");
-  }
-
-  function endGame() {
-    running = false;
-    gameOver = true;
-    updateBestScore(score);
-    updateHud("Game Over", "Idle", "게임 오버입니다. Restart를 눌러 다시 시작하세요.");
-    render();
+  function formatSeconds(ms) {
+    return `${Math.ceil(ms / 1000)}s`;
   }
 
   function boostLabel() {
@@ -178,16 +130,124 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
     return "Idle";
   }
 
-  function formatSeconds(ms) {
-    return `${Math.ceil(ms / 1000)}s`;
+  function setControlView(mode) {
+    if (!gameControlIcon || !gameControlLabel) return;
+
+    const views = {
+      start: { icon: "▶", label: "Start" },
+      pause: { icon: "❚❚", label: "Pause" },
+      resume: { icon: "▶", label: "Continue" },
+      restart: { icon: "↺", label: "Restart" },
+    };
+
+    const current = views[mode] || views.start;
+    gameControlIcon.textContent = current.icon;
+    gameControlLabel.textContent = current.label;
   }
 
-  function updateHud(status, boost, overlayText) {
+  function updateHud(status, boost, message, controlMode) {
     gameState.textContent = status;
     powerState.textContent = boost;
     scoreValue.textContent = String(score);
     bestValue.textContent = String(bestScore);
-    gameOverlay.textContent = overlayText;
+    gameMessage.textContent = message;
+    setControlView(controlMode);
+  }
+
+  function resetGame() {
+    snake = [
+      { x: 10, y: 12 },
+      { x: 9, y: 12 },
+      { x: 8, y: 12 },
+    ];
+    direction = { x: 1, y: 0 };
+    queuedDirection = { x: 1, y: 0 };
+    pendingGrowth = 0;
+    score = 0;
+    running = false;
+    gameOver = false;
+    hasStarted = false;
+    isPaused = false;
+    shieldUntil = 0;
+    doubleUntil = 0;
+    placeFood();
+    placeShield();
+    placeDouble();
+    updateHud("Ready", "Idle", "Start 버튼을 눌러 게임을 시작하세요.", "start");
+    render();
+  }
+
+  function startGame() {
+    if (gameOver) {
+      resetGame();
+    }
+
+    hasStarted = true;
+    isPaused = false;
+    lastTick = performance.now();
+    accumulator = 0;
+    running = true;
+    updateHud("Running", boostLabel(), "게임이 진행 중입니다.", "pause");
+  }
+
+  function pauseGame() {
+    if (gameOver || !running) return;
+    running = false;
+    isPaused = true;
+    lastTick = performance.now();
+    accumulator = 0;
+    updateHud("Paused", boostLabel(), "일시정지 상태입니다. Continue를 눌러 다시 진행하세요.", "resume");
+  }
+
+  function resumeGame() {
+    if (gameOver || !isPaused) return;
+    running = true;
+    isPaused = false;
+    lastTick = performance.now();
+    accumulator = 0;
+    updateHud("Running", boostLabel(), "게임이 다시 진행됩니다.", "pause");
+  }
+
+  function restartGame() {
+    resetGame();
+    hasStarted = true;
+    isPaused = false;
+    lastTick = performance.now();
+    accumulator = 0;
+    running = true;
+    updateHud("Running", boostLabel(), "게임을 다시 시작했습니다.", "pause");
+  }
+
+  function toggleControl() {
+    if (gameOver) {
+      restartGame();
+      return;
+    }
+
+    if (!hasStarted) {
+      startGame();
+      return;
+    }
+
+    if (running) {
+      pauseGame();
+      return;
+    }
+
+    if (isPaused) {
+      resumeGame();
+      return;
+    }
+
+    restartGame();
+  }
+
+  function endGame() {
+    running = false;
+    gameOver = true;
+    updateBestScore(score);
+    updateHud("Game Over", "Idle", "게임 오버입니다. Restart 버튼을 눌러 다시시작하세요.", "restart");
+    render();
   }
 
   function setDirection(next) {
@@ -264,7 +324,7 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
       snake.pop();
     }
 
-    updateHud("Running", boostLabel(), "게임이 진행 중입니다.");
+    updateHud("Running", boostLabel(), "게임이 진행 중입니다.", "pause");
   }
 
   function drawCell(cell, fillStyle, glow = false) {
@@ -319,7 +379,7 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
   }
 
   function drawItems() {
-    if (food) drawCell(food, "#ff8f6b", false);
+    if (food) drawCell(food, "#ff5c5c", false);
     if (shieldItem) drawCell(shieldItem, "#5dc5ff", true);
     if (doubleItem) drawCell(doubleItem, "#ffd34d", true);
   }
@@ -334,6 +394,7 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
     if (!lastTick) lastTick = timestamp;
     const elapsed = timestamp - lastTick;
     lastTick = timestamp;
+
     if (running && !gameOver) {
       accumulator += elapsed;
       while (accumulator >= STEP_MS) {
@@ -346,32 +407,51 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
     }
 
     updateHud(
-      gameOver ? "Game Over" : running ? "Running" : "Paused",
+      gameOver ? "Game Over" : running ? "Running" : isPaused ? "Paused" : "Ready",
       boostLabel(),
       gameOver
-        ? "게임 오버입니다. Restart를 눌러 다시 시작하세요."
+        ? "게임 오버입니다. Restart 버튼을 눌러 다시시작하세요."
         : running
           ? "게임이 진행 중입니다."
-          : "일시정지 상태입니다. Start 또는 Pause를 눌러 진행하세요."
+          : isPaused
+            ? "일시정지 상태입니다. Continue를 눌러 다시 진행하세요."
+            : "Start 버튼을 눌러 게임을 시작하세요.",
+      gameOver ? "restart" : running ? "pause" : isPaused ? "resume" : "start"
     );
     render();
     animationId = window.requestAnimationFrame(frame);
   }
 
   function bindControls() {
-    startButton?.addEventListener("click", startGame);
-    pauseButton?.addEventListener("click", pauseGame);
-    restartButton?.addEventListener("click", restartGame);
+    gameControl.addEventListener("click", toggleControl);
 
-    touchControls?.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-direction]");
-      if (!button) return;
-      const { direction: dir } = button.dataset;
-      if (dir === "up") setDirection({ x: 0, y: -1 });
-      if (dir === "down") setDirection({ x: 0, y: 1 });
-      if (dir === "left") setDirection({ x: -1, y: 0 });
-      if (dir === "right") setDirection({ x: 1, y: 0 });
-      gameCanvas.focus?.();
+    gameCanvas.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" && event.buttons !== 1) return;
+      swipeStart = { x: event.clientX, y: event.clientY };
+    });
+
+    gameCanvas.addEventListener("pointerup", (event) => {
+      if (!swipeStart) return;
+      const dx = event.clientX - swipeStart.x;
+      const dy = event.clientY - swipeStart.y;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+      swipeStart = null;
+
+      if (Math.max(absX, absY) < 24) {
+        return;
+      }
+
+      if (absX > absY) {
+        setDirection(dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 });
+        return;
+      }
+
+      setDirection(dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 });
+    });
+
+    gameCanvas.addEventListener("pointercancel", () => {
+      swipeStart = null;
     });
 
     window.addEventListener("keydown", (event) => {
@@ -395,11 +475,11 @@ if (gameCanvas && scoreValue && bestValue && gameState && powerState && gameOver
       }
       if (key === " " || key === "p") {
         event.preventDefault();
-        pauseGame();
+        toggleControl();
       }
       if (key === "enter") {
         event.preventDefault();
-        startGame();
+        toggleControl();
       }
       if (key === "r") {
         event.preventDefault();

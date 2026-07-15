@@ -191,6 +191,40 @@ h1 {
   gap: 0.35rem;
 }
 
+.compact li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.game-point-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.game-dot {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.72);
+}
+
+.food-dot {
+  background: #ff5c5c;
+}
+
+.shield-dot {
+  background: #5dc5ff;
+}
+
+.double-dot {
+  background: #ffd34d;
+}
+
 .inline-link {
   color: var(--sky-700);
   font-weight: 700;
@@ -230,39 +264,14 @@ h1 {
   gap: 0.75rem;
 }
 
-.touch-controls {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
-  max-width: 280px;
+.game-state-button {
+  min-width: 160px;
+  gap: 0.7rem;
 }
 
-.touch-controls button {
-  min-height: 52px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--ink);
-  font-weight: 700;
-}
-
-.touch-controls button[data-direction="up"] {
-  grid-column: 2;
-}
-
-.touch-controls button[data-direction="left"] {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.touch-controls button[data-direction="down"] {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-.touch-controls button[data-direction="right"] {
-  grid-column: 3;
-  grid-row: 2;
+.game-control-icon {
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .games-panel {
@@ -275,16 +284,17 @@ h1 {
 }
 
 .game-stage {
-  position: relative;
+  display: grid;
+  gap: 0.8rem;
   width: 100%;
   max-width: 480px;
-  aspect-ratio: 1 / 1;
   justify-self: center;
 }
 
 .game-stage canvas {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
   display: block;
   border-radius: 24px;
   border: 1px solid var(--border);
@@ -307,15 +317,20 @@ h1 {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45), var(--shadow);
 }
 
-.game-overlay {
-  position: absolute;
-  inset: auto 1rem 1rem 1rem;
+.game-message {
   padding: 0.9rem 1rem;
-  border-radius: 16px;
-  background: rgba(15, 45, 61, 0.72);
-  color: white;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(17, 118, 168, 0.16);
+  color: var(--muted);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.55;
+  box-shadow: 0 10px 24px rgba(17, 118, 168, 0.08);
+  text-align: center;
+}
+
+.game-message:empty {
+  display: none;
 }
 
 @media (max-width: 900px) {
