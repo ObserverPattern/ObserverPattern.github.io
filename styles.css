@@ -1,0 +1,237 @@
+:root {
+  color-scheme: light;
+  --sky-50: #f2fbff;
+  --sky-100: #dff6ff;
+  --sky-300: #8ddaf7;
+  --sky-500: #39b9ef;
+  --sky-700: #1176a8;
+  --ink: #0f2d3d;
+  --muted: #4e6b7d;
+  --card: rgba(255, 255, 255, 0.78);
+  --border: rgba(17, 118, 168, 0.18);
+  --shadow: 0 18px 50px rgba(17, 118, 168, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top, rgba(141, 218, 247, 0.45), transparent 35%),
+    linear-gradient(180deg, var(--sky-50), #ffffff 42%, #eefcff 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-header,
+main {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  backdrop-filter: blur(14px);
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.nav-toggle {
+  display: none;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.site-nav a {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.hero {
+  padding: 5rem 0 3rem;
+  max-width: 720px;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  color: var(--sky-700);
+  font-weight: 700;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: clamp(2.6rem, 6vw, 5.2rem);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+
+.hero-copy {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 58ch;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.85rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.button.primary {
+  background: var(--sky-500);
+  color: white;
+}
+
+.button.secondary {
+  background: white;
+  border-color: var(--border);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+
+.card,
+.games-panel {
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.card {
+  padding: 1.5rem;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+}
+
+.games-panel {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1.5rem;
+  margin: 1.5rem 0 3rem;
+}
+
+.game-placeholder {
+  min-height: 220px;
+  border-radius: 22px;
+  border: 1px dashed rgba(17, 118, 168, 0.3);
+  background:
+    linear-gradient(135deg, rgba(141, 218, 247, 0.28), rgba(255, 255, 255, 0.72)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(17, 118, 168, 0.07),
+      rgba(17, 118, 168, 0.07) 12px,
+      transparent 12px,
+      transparent 24px
+    );
+  display: grid;
+  place-items: center;
+  color: var(--sky-700);
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .content-grid,
+  .games-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    flex-wrap: wrap;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .site-nav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 24px;
+  }
+
+  .site-nav.is-open {
+    display: flex;
+  }
+
+  .hero {
+    padding-top: 3.5rem;
+  }
+
+  h1 {
+    line-height: 1.02;
+  }
+}
