@@ -47,21 +47,13 @@
       </section>
 
       <section class="content-grid">
-        <article class="card" id="about">
+        <article class="card card--compact" id="about">
           <h2>About</h2>
           <p>AI Agent와 인터페이스를 좋아하는 개발자입니다.</p>
           <p>취미는 풋살이고, 좋아하는 축구팀은 맨체스터 시티입니다.</p>
         </article>
 
-        <article class="card" id="projects">
-          <h2>Projects</h2>
-          <ul class="list">
-            <li>반응형 개인 포트폴리오 사이트</li>
-            <li>지렁이 게임이 포함된 정적 웹사이트</li>
-          </ul>
-        </article>
-
-        <article class="card" id="experience">
+        <article class="card card--compact" id="experience">
           <h2>Experience</h2>
           <ul class="list">
             <li>성장형 프로젝트 구현</li>
@@ -69,7 +61,7 @@
           </ul>
         </article>
 
-        <article class="card" id="research">
+        <article class="card card--compact" id="research">
           <h2>Research</h2>
           <ul class="list">
             <li>AI Agent 기반 인터페이스 설계</li>
@@ -77,7 +69,7 @@
           </ul>
         </article>
 
-        <article class="card" id="contact">
+        <article class="card card--compact" id="contact">
           <h2>Contact</h2>
           <p>작업 문의나 제안은 GitHub Issues로 남겨주세요.</p>
           <p>
@@ -87,6 +79,27 @@
           </p>
         </article>
       </section>
+
+      <article class="card projects-card" id="projects">
+        <div class="section-head">
+          <p class="eyebrow">Projects</p>
+          <h2>프로젝트 카드 안에서 두 개의 작업을 둘러보실 수 있습니다.</h2>
+        </div>
+        <div class="project-grid">
+          <button class="project-card" type="button" data-project="quant">
+            <span class="project-card__tag">Quant</span>
+            <h3>퀀트 프로젝트</h3>
+            <p>숫자와 흐름을 읽는 프로젝트입니다. 짧게 훑고, 자세한 이야기는 팝업에서 볼 수 있습니다.</p>
+            <span class="project-card__cta">자세히 보기</span>
+          </button>
+          <button class="project-card" type="button" data-project="pt-agent">
+            <span class="project-card__tag">Agent</span>
+            <h3>개인 PT 에이전트</h3>
+            <p>운동 루틴을 돕는 가벼운 에이전트 프로젝트입니다. 진행 상황은 팝업에서 확인하세요.</p>
+            <span class="project-card__cta">자세히 보기</span>
+          </button>
+        </div>
+      </article>
 
       <section class="games-panel" id="games">
         <div class="games-copy">
@@ -130,7 +143,7 @@
           </div>
           <div class="game-actions">
             <button class="button primary game-state-button" id="game-control" type="button">
-              <span class="game-control-icon" id="game-control-icon" aria-hidden="true">▶</span>
+              <span class="game-control-icon" id="game-control-icon" aria-hidden="true">&#9654;</span>
               <span id="game-control-label">Start</span>
             </button>
           </div>
@@ -143,5 +156,24 @@
         </div>
       </section>
     </main>
+
+    <div class="project-modal" id="project-modal" hidden>
+      <button class="project-modal__backdrop" type="button" data-modal-close aria-label="닫기"></button>
+      <div
+        class="project-modal__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-modal-title"
+        tabindex="-1"
+      >
+        <button class="project-modal__close" type="button" data-modal-close aria-label="팝업 닫기">
+          ×
+        </button>
+        <p class="project-modal__eyebrow" id="project-modal-eyebrow">Project</p>
+        <h3 id="project-modal-title">프로젝트</h3>
+        <p class="project-modal__summary" id="project-modal-summary"></p>
+        <p class="project-modal__note" id="project-modal-note"></p>
+      </div>
+    </div>
   </body>
 </html>
